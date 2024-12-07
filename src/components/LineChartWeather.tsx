@@ -1,38 +1,54 @@
 import Paper from '@mui/material/Paper';
- import { LineChart } from '@mui/x-charts/LineChart';
+import { LineChart } from '@mui/x-charts/LineChart';
 
- const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
- const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
- const xLabels = [
-     'Page A',
-     'Page B',
-     'Page C',
-     'Page D',
-     'Page E',
-     'Page F',
-     'Page G',
- ];
+interface LineChartWeatherProps {
+  selectedVariable: string;
+  humidityData: number[];
+  precipitationData: number[];
+  cloudsData: number[];
+  timeLabels: string[];
+}
 
- export default function LineChartWeather() {
-     return (
-         <Paper
-             sx={{
-                 p: 2,
-                 display: 'flex',
-                 flexDirection: 'column'
-             }}
-         >
+export default function LineChartWeather({
+  selectedVariable,
+  humidityData,
+  precipitationData,
+  cloudsData,
+  timeLabels,
+}: LineChartWeatherProps) {
+  let data;
+  let label;
 
-             {/* Componente para un gráfico de líneas */}
-             <LineChart
-                 width={400}
-                 height={250}
-                 series={[
-                     { data: pData, label: 'pv' },
-                     { data: uData, label: 'uv' },
-                 ]}
-                 xAxis={[{ scaleType: 'point', data: xLabels }]}
-             />
-         </Paper>
-     );
- }
+  switch (selectedVariable) {
+    case 'precipitation':
+      data = precipitationData;
+      label = 'Precipitación';
+      break;
+    case 'clouds':
+      data = cloudsData;
+      label = 'Nubosidad';
+      break;
+    case 'humidity':
+    default:
+      data = humidityData;
+      label = 'Humedad';
+      break;
+  }
+
+  return (
+    <Paper
+      sx={{
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <LineChart
+        width={400}
+        height={250}
+        series={[{ data, label }]}
+        xAxis={[{ scaleType: 'point', data: timeLabels }]}
+      />
+    </Paper>
+  );
+}

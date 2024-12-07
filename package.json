@@ -2,7 +2,7 @@
   "name": "dashboard",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://Alex-Benites.github.io/dashboard",
+  "homepage": "https://alex-benites.github.io/dashboard",
   "type": "module",
   "scripts": {
     "dev": "vite",
