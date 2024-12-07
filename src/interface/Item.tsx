@@ -4,6 +4,8 @@ export default interface Item {
     precipitation: String;
     humidity: String;
     clouds: String;
+    pressure: String; 
+    pressureUnit: String;
 }
 
 

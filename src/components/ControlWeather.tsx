@@ -25,9 +25,9 @@ export default function ControlWeather({ selectedVariable, onVariableChange }: C
 
      {/* Arreglo de objetos */}
      const items = [
-        { name: 'Precipitación', value: 'precipitation', description: 'Cantidad de agua...' },
-        { name: 'Humedad', value: 'humidity', description: 'Cantidad de vapor de agua...' },
-        { name: 'Nubosidad', value: 'clouds', description: 'Grado de cobertura del cielo...' },
+        { name: 'Precipitación', value: 'precipitation', description: '' },
+        { name: 'Humedad', value: 'humidity', description: '' },
+        { name: 'Nubosidad', value: 'clouds', description: '' },
     ];
 
      {/* Arreglo de elementos JSX */}
