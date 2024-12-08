@@ -1,55 +1,34 @@
-import React from 'react';
-import { LineChart } from '@mui/x-charts/LineChart';
-import Paper from '@mui/material/Paper';
+import React from "react";
+import { Chart } from "react-google-charts";
 
-interface WindSpeedChartProps {
-  windSpeedData: number[];
-  windSpeedLabels: string[];
-}
-
-const WindSpeedChart: React.FC<WindSpeedChartProps> = ({ windSpeedData, windSpeedLabels }) => {
-  // Comprobación de datos
-  if (windSpeedData.length === 0 || windSpeedLabels.length === 0) {
-    return <div>No data available</div>; // Mensaje alternativo si no hay datos
-  }
-
-  // Formateo de etiquetas de tiempo
-  const formattedLabels = windSpeedLabels.map(label => {
-    // Verificar si la etiqueta es una fecha válida
-    const date = new Date(label);
-    return !isNaN(date.getTime())
-      ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
-      : label;
-  });
-
-  console.log('Wind Speed Data:', windSpeedData); // Verificar los datos
-  console.log('Formatted Wind Speed Labels:', formattedLabels); // Verificar etiquetas formateadas
-
-  return (
-    <Paper
-      sx={{
-        p: 2,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* Verificar si los datos están llegando correctamente */}
-      <div>Rendering WindSpeedChart with data: {windSpeedData.length} points</div>
-      <LineChart
-        width={500}
-        height={300}
-        xAxis={[{ data: formattedLabels, label: 'Time' }]} // Configuración de etiquetas de tiempo
-        series={[
-          {
-            data: windSpeedData,
-            label: 'Wind Speed (mps)',
-            color: 'blue', // Color de la línea
-            area: true, // Descomenta esto si quieres un gráfico de área
-          },
-        ]}
-      />
-    </Paper>
-  );
+export const options = {
+  title: "Wind Speed Over Time",
+  hAxis: {
+    title: "Time of Day",
+    titleTextStyle: { color: "#333" },
+  },
+  vAxis: {
+    title: "Wind Speed (mps)",
+    minValue: 0,
+  },
+  chartArea: { width: "60%", height: "70%" },
+  colors: ["#1E88E5"],
 };
 
-export default WindSpeedChart;
+interface WindSpeedChartProps {
+  windSpeedData: Array<[string, number]>;
+}
+
+export default function WindSpeedChart({ windSpeedData }: WindSpeedChartProps) {
+  const data = [["Time", "Wind Speed (mps)"], ...windSpeedData];
+
+  return (
+    <Chart
+      chartType="LineChart"
+      width="100%"
+      height="400px"
+      data={data}
+      options={options}
+    />
+  );
+}

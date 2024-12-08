@@ -41,11 +41,12 @@
   color: #888;
 }
 
+/*
 body {
-  background-image: url('./images/weather_dashboard_Design.png'); /* Asegúrate de usar la ruta correcta */
-  background-size: cover; /* Esto hace que la imagen cubra todo el área visible */
-  /*background-repeat: no-repeat; /* Evita que la imagen se repita */
-  background-position: center; /* Centra la imagen */
-  /*background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll */
-  color: #333; /* Cambia el color de texto si es necesario */
-}
+  background-image: url('./images/weather_dashboard_Design.png'); 
+  background-size: cover; 
+  /*background-repeat: no-repeat; 
+  background-position: center; 
+  /*background-attachment: fixed; 
+  color: #333; 
+}*/

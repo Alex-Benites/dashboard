@@ -19,9 +19,6 @@ import { useEffect, useState } from 'react';
 }
 
 function App() {
-  {
-    /* Variable de estado y función de actualización */
-  }
   let [indicators, setIndicators] = useState<Indicator[]>([]);
   let [owm, setOWM] = useState(localStorage.getItem("openWeatherMap"));
   let [items, setItems] = useState<Item[]>([]);
@@ -33,10 +30,42 @@ function App() {
   const [cloudsData, setCloudsData] = useState<number[]>([]);
   const [timeLabels, setTimeLabels] = useState<string[]>([]);
   const [selectedVariable, setSelectedVariable] = useState("humidity"); // Valor por defecto
-  const [windSpeedData, setWindSpeedData] = useState<number[]>([]);
-  const [windSpeedLabels, setWindSpeedLabels] = useState<string[]>([]);
+  const [windSpeedData, setWindSpeedData] = useState<Array<[string, number]>>([]);
+
 
   {/* Hooks: useEffect */}
+
+
+
+  useEffect(() => {
+    const fetchWindSpeedData = () => {
+      let savedTextXML = localStorage.getItem("openWeatherMap") || "";
+      if (savedTextXML) {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(savedTextXML, "application/xml");
+        const times = xml.getElementsByTagName("time");
+        const windSpeedValues: Array<[string, number]> = [];
+
+        for (let i = 0; i < times.length; i++) {
+          const time = times[i];
+          const fromTime = time.getAttribute("from") || "";
+          const windSpeed = parseFloat(
+            time.getElementsByTagName("windSpeed")[0]?.getAttribute("mps") || "0"
+          );
+
+          if (fromTime) {
+            const formattedTime = new Date(fromTime)
+              .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            windSpeedValues.push([formattedTime, windSpeed]);
+          }
+        }
+
+        setWindSpeedData(windSpeedValues);
+      }
+    };
+
+    fetchWindSpeedData();
+  }, []);
 
   useEffect(() => {
     const fetchWeatherData = async () => {
@@ -118,8 +147,7 @@ function App() {
         let labels: string[] = [];
         let pressureValues: string[] = [];
         let pressureUnits: string[] = [];
-        let windSpeedValues: number[] = []; 
-        let windSpeedLabelsArray: string[] = [];
+
 
         const times = xml.getElementsByTagName("time");
         for (let i = 0; i < Math.min(10, times.length); i++) {
@@ -141,8 +169,6 @@ function App() {
           const pressureUnit =
             time.getElementsByTagName("pressure")[0]?.getAttribute("unit") ||
             "";
-          const windSpeed =
-            parseFloat(time.getElementsByTagName("windSpeed")[0]?.getAttribute("mps") || '0');
           
 
           dataToItems.push({
@@ -170,11 +196,8 @@ function App() {
           if (pressureUnit) {
             pressureUnits.push(pressureUnit);
           }
-          if (windSpeed) {
-            windSpeedValues.push(windSpeed);
-          }
+
           labels.push(dateStart);
-          windSpeedLabelsArray.push(dateStart);
         }
 
         {
@@ -215,17 +238,12 @@ function App() {
         });
 
 
-      //console.log('Wind Speed Data (useEffect):', windSpeedValues);
-      //console.log('Wind Speed Labels (useEffect):', windSpeedLabelsArray);
-
         setIndicators(dataToIndicators);
         setItems(dataToItems);
         setHumidityData(humidityValues.slice(0, 6));
         setPrecipitationData(precipitationValues.slice(0, 6));
         setCloudsData(cloudsValues.slice(0, 6));
         setTimeLabels(labels.slice(0, 6));
-        setWindSpeedData(windSpeedValues.slice(0, 6)); 
-        setWindSpeedLabels(windSpeedLabelsArray.slice(0, 6));
 
       }
     };
@@ -289,30 +307,17 @@ function App() {
           </Grid>
 
           {/* Segundo gráfico */}
-          <Grid item xs={12} md={4} xl={3}>
+          <Grid item xs={12} xl={10}>
           {/* Gráfico de velocidad del viento */}
-            <WindSpeedChart windSpeedData={windSpeedData} windSpeedLabels={windSpeedLabels} />
+            <WindSpeedChart windSpeedData={windSpeedData} />
           </Grid>
+          
           
         </Grid>
 
-        <Grid
-          item
-          xs={12}
-          md={4}
-          xl={3}
-          container
-          direction="column"
-          spacing={2}
-        >
+        <Grid item xs={12} md={4} xl={3} container direction="column" spacing={5}>
           {/* Columna para la tabla */}
-          <Grid
-            item
-            xs={12}
-            md={8}
-            xl={9}
-            sx={{ width: "120%", height: "200%" }}
-          >
+          <Grid item xs={12} md={8} xl={9} sx={{ width: "120%", height: "200%" }}>
             <TableWeather itemsIn={items} />
           </Grid>
         </Grid>
@@ -325,10 +330,6 @@ function App() {
         />
       </Grid>
 
-      <Grid item xs={12} md={4} xl={3}>
-          {/* Gráfico de velocidad del viento */}
-            <WindSpeedChart windSpeedData={windSpeedData} windSpeedLabels={windSpeedLabels} />
-          </Grid>
     </Grid>
   );
 }
