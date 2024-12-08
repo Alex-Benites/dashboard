@@ -150,7 +150,7 @@ function App() {
 
 
         const times = xml.getElementsByTagName("time");
-        for (let i = 0; i < Math.min(10, times.length); i++) {
+        for (let i = 0; i < Math.min(12, times.length); i++) {
           const time = times[i];
           const dateStart = time.getAttribute("from") || "";
           const dateEnd = time.getAttribute("to") || "";
@@ -209,7 +209,7 @@ function App() {
 
         let name = xml.getElementsByTagName("name")[0].innerHTML || "";
         dataToIndicators.push({
-          title: "Location",
+          title: "Indicator 1",
           subtitle: "City",
           value: name,
         });
@@ -218,21 +218,21 @@ function App() {
 
         let latitude = location.getAttribute("latitude") || "";
         dataToIndicators.push({
-          title: "Location",
+          title: "Indicator 2",
           subtitle: "Latitude",
           value: latitude,
         });
 
         let longitude = location.getAttribute("longitude") || "";
         dataToIndicators.push({
-          title: "Location",
+          title: "Indicator 3",
           subtitle: "Longitude",
           value: longitude,
         });
 
         let altitude = location.getAttribute("altitude") || "";
         dataToIndicators.push({
-          title: "Location",
+          title: "Indicator 4",
           subtitle: "Altitude",
           value: altitude,
         });
@@ -286,17 +286,9 @@ function App() {
       {/* Contenedor para los gráficos y la tabla */}
       <Grid container spacing={2}>
         {/* Columna para los gráficos */}
-        <Grid
-          item
-          xs={12}
-          md={4}
-          xl={3}
-          container
-          direction="column"
-          spacing={2}
-        >
+        <Grid item xs={20} md={4} xl={6} container direction="column" spacing={2}>
           {/* Primer gráfico */}
-          <Grid item>
+          <Grid size={{ xs: 12, xl: 5 }}>
             <LineChartWeather
               selectedVariable={selectedVariable}
               humidityData={humidityData}
@@ -307,7 +299,7 @@ function App() {
           </Grid>
 
           {/* Segundo gráfico */}
-          <Grid item xs={12} xl={10}>
+          <Grid size={{ xs: 12 }}>
           {/* Gráfico de velocidad del viento */}
             <WindSpeedChart windSpeedData={windSpeedData} />
           </Grid>
@@ -317,7 +309,7 @@ function App() {
 
         <Grid item xs={12} md={4} xl={3} container direction="column" spacing={5}>
           {/* Columna para la tabla */}
-          <Grid item xs={12} md={8} xl={9} sx={{ width: "120%", height: "200%" }}>
+          <Grid item xs={12} md={8} xl={9} sx={{ width: "123%", height: "200%", marginLeft: "30px" }} spacing={5}>
             <TableWeather itemsIn={items} />
           </Grid>
         </Grid>
@@ -328,6 +320,10 @@ function App() {
           selectedVariable={selectedVariable}
           onVariableChange={setSelectedVariable}
         />
+      </Grid>
+
+      <Grid size={{ xs: 10, xl: 3 }}>
+            <WindSpeedChart windSpeedData={windSpeedData} />
       </Grid>
 
     </Grid>
