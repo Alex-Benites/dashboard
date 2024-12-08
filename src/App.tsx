@@ -6,6 +6,7 @@ import ControlWeather from './components/ControlWeather';
 import LineChartWeather from './components/LineChartWeather';
 import WeatherCard from './components/CardWeather';
 import Item from './interface/Item';
+import WindSpeedChart from './components/WindSpeedChart';
 
 
 {/* Hooks */ }
@@ -32,10 +33,42 @@ function App() {
   const [cloudsData, setCloudsData] = useState<number[]>([]);
   const [timeLabels, setTimeLabels] = useState<string[]>([]);
   const [selectedVariable, setSelectedVariable] = useState("humidity"); // Valor por defecto
+  const [windSpeedData, setWindSpeedData] = useState<number[]>([]);
+  const [windSpeedLabels, setWindSpeedLabels] = useState<string[]>([]);
 
-  {
-    /* Hook: useEffect */
-  }
+  {/* Hooks: useEffect */}
+
+  useEffect(() => {
+    const fetchWeatherData = async () => {
+      let savedTextXML = localStorage.getItem("openWeatherMap") || "";
+      if (savedTextXML) {
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(savedTextXML, "application/xml");
+
+        // Extraer la primera entrada de pronóstico
+        const firstTimeEntry = xml.getElementsByTagName('time')[0];
+
+        if (firstTimeEntry) {
+          const temperatureK = parseFloat(firstTimeEntry.getElementsByTagName('temperature')[0]?.getAttribute('value') || '0');
+          const condition = firstTimeEntry.getElementsByTagName('symbol')[0]?.getAttribute('name') || 'Desconocido';
+          const windSpeed = parseFloat(firstTimeEntry.getElementsByTagName('windSpeed')[0]?.getAttribute('mps') || '0');
+          const windDirection = firstTimeEntry.getElementsByTagName('windDirection')[0]?.getAttribute('name') || 'Desconocido';
+          const visibility = parseFloat(firstTimeEntry.getElementsByTagName('visibility')[0]?.getAttribute('value') || '0');
+
+          setWeatherData({
+            temperatureK,
+            condition,
+            windSpeed,
+            windDirection,
+            visibility,
+            lastUpdated: currentTime,
+          });
+        }
+      }
+    };
+
+    fetchWeatherData();
+  }, [currentTime]);
 
   useEffect(() => {
     // Función para actualizar la hora en tiempo real
@@ -49,73 +82,34 @@ function App() {
 
   useEffect(() => {
     let request = async () => {
-      {
-        /* Referencia a las claves del LocalStorage: openWeatherMap y expiringTime */
-      }
       let savedTextXML = localStorage.getItem("openWeatherMap") || "";
       let expiringTime = localStorage.getItem("expiringTime");
-
-      {
-        /* Obtenga la estampa de tiempo actual */
-      }
       let nowTime = new Date().getTime();
 
-      {
-        /* Verifique si es que no existe la clave expiringTime o si la estampa de tiempo actual supera el tiempo de expiración */
-      }
       if (expiringTime === null || nowTime > parseInt(expiringTime)) {
-        {
-          /* Request */
-        }
         let API_KEY = "7b1c486c081e257c8e4038d058aaf936";
         let response = await fetch(
           `https://api.openweathermap.org/data/2.5/forecast?q=Guayaquil&mode=xml&appid=${API_KEY}`
         );
         let savedTextXML = await response.text();
-
-        {
-          /* Tiempo de expiración */
-        }
         let hours = 0.5;
         let delay = hours * 3600000;
         let expiringTime = nowTime + delay;
 
-        {
-          /* En el LocalStorage, almacene el texto en la clave openWeatherMap, estampa actual y estampa de tiempo de expiración */
-        }
         localStorage.setItem("openWeatherMap", savedTextXML);
         localStorage.setItem("expiringTime", expiringTime.toString());
         localStorage.setItem("nowTime", nowTime.toString());
-
-        {
-          /* DateTime */
-        }
         localStorage.setItem(
           "expiringDateTime",
           new Date(expiringTime).toString()
         );
         localStorage.setItem("nowDateTime", new Date(nowTime).toString());
-
-        {
-          /* Modificación de la variable de estado mediante la función de actualización */
-        }
         setOWM(savedTextXML);
       }
-
-      {
-        /* Valide el procesamiento con el valor de savedTextXML */
-      }
       if (savedTextXML) {
-        {
-          /* XML Parser */
-        }
+
         const parser = new DOMParser();
         const xml = parser.parseFromString(savedTextXML, "application/xml");
-
-        {
-          /* Arreglo para agregar los resultados */
-        }
-
         let dataToIndicators: Indicator[] = new Array<Indicator>();
         let dataToItems: Item[] = [];
         let humidityValues: number[] = [];
@@ -124,48 +118,11 @@ function App() {
         let labels: string[] = [];
         let pressureValues: string[] = [];
         let pressureUnits: string[] = [];
-
-        // Extraer la primera entrada de pronóstico
-        const firstTimeEntry = xml.getElementsByTagName("time")[0];
-
-        if (firstTimeEntry) {
-          const temperatureK = parseFloat(
-            firstTimeEntry
-              .getElementsByTagName("temperature")[0]
-              ?.getAttribute("value") || "0"
-          );
-          const condition =
-            firstTimeEntry
-              .getElementsByTagName("symbol")[0]
-              ?.getAttribute("name") || "Desconocido";
-          const windSpeed = parseFloat(
-            firstTimeEntry
-              .getElementsByTagName("windSpeed")[0]
-              ?.getAttribute("mps") || "0"
-          );
-          const windDirection =
-            firstTimeEntry
-              .getElementsByTagName("windDirection")[0]
-              ?.getAttribute("name") || "Desconocido";
-          const visibility = parseFloat(
-            firstTimeEntry
-              .getElementsByTagName("visibility")[0]
-              ?.getAttribute("value") || "0"
-          );
-          //const lastUpdated = new Date().toISOString();
-
-          setWeatherData({
-            temperatureK,
-            condition,
-            windSpeed,
-            windDirection,
-            visibility,
-            lastUpdated: currentTime,
-          });
-        }
+        let windSpeedValues: number[] = []; 
+        let windSpeedLabelsArray: string[] = [];
 
         const times = xml.getElementsByTagName("time");
-        for (let i = 0; i < Math.min(6, times.length); i++) {
+        for (let i = 0; i < Math.min(10, times.length); i++) {
           const time = times[i];
           const dateStart = time.getAttribute("from") || "";
           const dateEnd = time.getAttribute("to") || "";
@@ -184,6 +141,9 @@ function App() {
           const pressureUnit =
             time.getElementsByTagName("pressure")[0]?.getAttribute("unit") ||
             "";
+          const windSpeed =
+            parseFloat(time.getElementsByTagName("windSpeed")[0]?.getAttribute("mps") || '0');
+          
 
           dataToItems.push({
             dateStart,
@@ -210,7 +170,11 @@ function App() {
           if (pressureUnit) {
             pressureUnits.push(pressureUnit);
           }
+          if (windSpeed) {
+            windSpeedValues.push(windSpeed);
+          }
           labels.push(dateStart);
+          windSpeedLabelsArray.push(dateStart);
         }
 
         {
@@ -250,20 +214,24 @@ function App() {
           value: altitude,
         });
 
-        {
-          /* Modificación de la variable de estado mediante la función de actualización */
-        }
+
+      //console.log('Wind Speed Data (useEffect):', windSpeedValues);
+      //console.log('Wind Speed Labels (useEffect):', windSpeedLabelsArray);
+
         setIndicators(dataToIndicators);
         setItems(dataToItems);
-        setHumidityData(humidityValues);
-        setPrecipitationData(precipitationValues);
-        setCloudsData(cloudsValues);
-        setTimeLabels(labels);
+        setHumidityData(humidityValues.slice(0, 6));
+        setPrecipitationData(precipitationValues.slice(0, 6));
+        setCloudsData(cloudsValues.slice(0, 6));
+        setTimeLabels(labels.slice(0, 6));
+        setWindSpeedData(windSpeedValues.slice(0, 6)); 
+        setWindSpeedLabels(windSpeedLabelsArray.slice(0, 6));
+
       }
     };
 
     request();
-  }, [owm, currentTime]);
+  }, [owm]);
 
   let renderIndicators = () => {
     return indicators.map((indicator, idx) => (
@@ -279,10 +247,9 @@ function App() {
 
   return (
     <Grid container spacing={5}>
-
       {/* Card principal*/}
       {weatherData && (
-        <Grid size={{ xs: 12, xl: 8 }}>
+        <Grid size={{ xs: 3 }} sx={{ textAlign: "left" }}>
           <WeatherCard
             temperatureK={weatherData.temperatureK}
             condition={weatherData.condition}
@@ -293,32 +260,75 @@ function App() {
           />
         </Grid>
       )}
-      {renderIndicators()}
-      {/* Tabla */}
-      <Grid size={{ xs: 12, xl: 8 }}>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, xl: 3 }}>
-            <ControlWeather
+
+      <Grid container size={{ xs: 15 }} spacing={5}>
+        {renderIndicators()}
+      </Grid>
+
+      {/* Contenedor para los gráficos y la tabla */}
+      <Grid container spacing={2}>
+        {/* Columna para los gráficos */}
+        <Grid
+          item
+          xs={12}
+          md={4}
+          xl={3}
+          container
+          direction="column"
+          spacing={2}
+        >
+          {/* Primer gráfico */}
+          <Grid item>
+            <LineChartWeather
               selectedVariable={selectedVariable}
-              onVariableChange={setSelectedVariable}
+              humidityData={humidityData}
+              precipitationData={precipitationData}
+              cloudsData={cloudsData}
+              timeLabels={timeLabels}
             />
           </Grid>
-          <Grid size={{ xs: 12, xl: 9 }}>
+
+          {/* Segundo gráfico */}
+          <Grid item xs={12} md={4} xl={3}>
+          {/* Gráfico de velocidad del viento */}
+            <WindSpeedChart windSpeedData={windSpeedData} windSpeedLabels={windSpeedLabels} />
+          </Grid>
+          
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+          md={4}
+          xl={3}
+          container
+          direction="column"
+          spacing={2}
+        >
+          {/* Columna para la tabla */}
+          <Grid
+            item
+            xs={12}
+            md={8}
+            xl={9}
+            sx={{ width: "120%", height: "200%" }}
+          >
             <TableWeather itemsIn={items} />
           </Grid>
         </Grid>
       </Grid>
 
-      {/* Gráfico */}
-      <Grid size={{ xs: 12, md: 4 }}>
-        <LineChartWeather
+      <Grid size={{ xs: 12, xl: 3 }}>
+        <ControlWeather
           selectedVariable={selectedVariable}
-          humidityData={humidityData}
-          precipitationData={precipitationData}
-          cloudsData={cloudsData}
-          timeLabels={timeLabels}
+          onVariableChange={setSelectedVariable}
         />
       </Grid>
+
+      <Grid item xs={12} md={4} xl={3}>
+          {/* Gráfico de velocidad del viento */}
+            <WindSpeedChart windSpeedData={windSpeedData} windSpeedLabels={windSpeedLabels} />
+          </Grid>
     </Grid>
   );
 }
