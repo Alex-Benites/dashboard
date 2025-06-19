@@ -1,8 +1,7 @@
-import React from "react";
 import { Chart } from "react-google-charts";
 
 export const options = {
-  title: "Wind Speed Over Time",
+  title: "Velocidad del viento por dia",
   hAxis: {
     title: "Time of Day",
     titleTextStyle: { color: "#333" },
@@ -20,7 +19,10 @@ interface WindSpeedChartProps {
 }
 
 export default function WindSpeedChart({ windSpeedData }: WindSpeedChartProps) {
-  const data = [["Time", "Wind Speed (mps)"], ...windSpeedData];
+  // Asegúrate de que los valores sean numéricos
+  const cleanedData = windSpeedData.map(([time, speed]) => [time, Number(speed)]);
+  
+  const data = [["Time", "Wind Speed (mps)"], ...cleanedData];
 
   return (
     <Chart

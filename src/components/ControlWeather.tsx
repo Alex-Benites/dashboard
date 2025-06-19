@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 
 
 // ControlWeather.tsx
@@ -61,6 +61,10 @@ export default function ControlWeather({ selectedVariable, onVariableChange }: C
         p: 2,
         display: 'flex',
         flexDirection: 'column',
+        borderRadius: "16px", 
+        overflow: "hidden", 
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+        background: '#f3f3f3'
       }}
     >
       <Typography mb={2} component="h3" variant="h6" color="primary">

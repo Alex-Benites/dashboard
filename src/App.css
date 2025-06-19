@@ -41,12 +41,13 @@
   color: #888;
 }
 
-/*
+
 body {
-  background-image: url('./images/weather_dashboard_Design.png'); 
+  background-image: url('./images/Fondo.svg'); 
   background-size: cover; 
-  /*background-repeat: no-repeat; 
+  background-repeat: no-repeat;
   background-position: center; 
-  /*background-attachment: fixed; 
-  color: #333; 
-}*/
+  /*background-attachment: fixed;*/ 
+  /*color: #333; */
+}
+

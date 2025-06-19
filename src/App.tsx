@@ -1,5 +1,5 @@
 import './App.css'
-import Grid from '@mui/material/Grid2' 
+import Grid from '@mui/material/Grid2'
 import IndicatorWeather from './components/IndicatorWeather';
 import TableWeather from './components/TableWeather';
 import ControlWeather from './components/ControlWeather';
@@ -7,12 +7,18 @@ import LineChartWeather from './components/LineChartWeather';
 import WeatherCard from './components/CardWeather';
 import Item from './interface/Item';
 import WindSpeedChart from './components/WindSpeedChart';
+import ImageComponent from "./components/ImageComponent";
 
+import muchasNubes from './images/muchasNubes.png';
+import nubesDespejadas from './images/nubesDespejadas.png';
+import LluviaLigera from './images/LluviaLigera.png';
+import LluviaModerada from './images/LluviModerada.png';
+import pocasNubes from './images/pocasNubes.png';
+import scaredCloud from './images/scaredCloud.png';
 
-{/* Hooks */ }
 import { useEffect, useState } from 'react';
 
- interface Indicator {
+interface Indicator {
   title?: String;
   subtitle?: String;
   value?: String;
@@ -31,6 +37,18 @@ function App() {
   const [timeLabels, setTimeLabels] = useState<string[]>([]);
   const [selectedVariable, setSelectedVariable] = useState("humidity"); // Valor por defecto
   const [windSpeedData, setWindSpeedData] = useState<Array<[string, number]>>([]);
+  const [currentImage, setCurrentImage] = useState<string>(muchasNubes);
+
+  // Mapeo de condiciones climáticas a imágenes
+  const conditionToImageMap: { [key: string]: string } = {
+    'broken clouds': nubesDespejadas,
+    'overcast clouds': muchasNubes,
+    'light rain': LluviaLigera,
+    'moderate rain': LluviaModerada,
+    'few clouds': pocasNubes,
+    'scattered clouds': scaredCloud,
+  };
+
 
 
   {/* Hooks: useEffect */}
@@ -92,6 +110,10 @@ function App() {
             visibility,
             lastUpdated: currentTime,
           });
+
+          // Actualizar la imagen según la condición
+          const imageUrl = conditionToImageMap[condition] || muchasNubes;
+          setCurrentImage(imageUrl);
         }
       }
     };
@@ -169,7 +191,7 @@ function App() {
           const pressureUnit =
             time.getElementsByTagName("pressure")[0]?.getAttribute("unit") ||
             "";
-          
+
 
           dataToItems.push({
             dateStart,
@@ -201,8 +223,8 @@ function App() {
         }
 
         {
-          /* 
-            Análisis, extracción y almacenamiento del contenido del XML 
+          /*
+            Análisis, extracción y almacenamiento del contenido del XML
             en el arreglo de resultados
         */
         }
@@ -253,21 +275,25 @@ function App() {
 
   let renderIndicators = () => {
     return indicators.map((indicator, idx) => (
-      <Grid key={idx} size={{ xs: 12, md: 3 }}>
+
+      <Grid key={idx} size={{ xs:12, sm:6, md:3 }} sx={{ padding: '10px' }} >
+      {/*<Grid key={idx} size={{ xs: 12, md: 3 }} >*/}
         <IndicatorWeather
           title={indicator["title"]}
           subtitle={indicator["subtitle"]}
           value={indicator["value"]}
-        />
+         />
       </Grid>
     ));
   };
 
   return (
-    <Grid container spacing={5}>
+    <Grid container spacing={3} sx={{ padding: '16px' }}>
       {/* Card principal*/}
       {weatherData && (
-        <Grid size={{ xs: 3 }} sx={{ textAlign: "left" }}>
+
+        <Grid size={{ xs: 12, sm: 6, md: 3 }} sx={{ textAlign: "left", marginBottom: '16px' }} >
+        {/*<Grid size={{ xs: 3 }} sx={{ textAlign: "left", marginRight:"650px"}} >*/}
           <WeatherCard
             temperatureK={weatherData.temperatureK}
             condition={weatherData.condition}
@@ -277,18 +303,40 @@ function App() {
             lastUpdated={weatherData.lastUpdated}
           />
         </Grid>
-      )}
 
-      <Grid container size={{ xs: 15 }} spacing={5}>
+      )}
+      {/*Grid spacing={20}*/}
+
+      <Grid size={{ xs:8, sm:8, md:9 }} sx={{ marginBottom: '16px' }} spacing={20}>
+        <ImageComponent
+          imageUrl={currentImage}
+          altText="Ejemplo de imagen"
+          width="50%"
+          height="250px"
+
+        />
+      </Grid>
+      <Grid size={{ xs:6 , sm: 15, md: 15 }} container spacing={5}>
+      {/*<Grid container size={{ xs: 15 }} spacing={5} className= "indicator">*/}
         {renderIndicators()}
       </Grid>
 
+
+      {/*<Grid size={{ xs: 12, xl: 4 }}>*/}
+      <Grid size={{ xs:6 , sm: 15, md: 15 }} sx={{ marginTop: '16px' }}>
+          <ControlWeather
+            selectedVariable={selectedVariable}
+            onVariableChange={setSelectedVariable}
+          />
+      </Grid>
+
+
       {/* Contenedor para los gráficos y la tabla */}
-      <Grid container spacing={2}>
-        {/* Columna para los gráficos */}
-        <Grid item xs={20} md={4} xl={6} container direction="column" spacing={2}>
-          {/* Primer gráfico */}
-          <Grid size={{ xs: 12, xl: 5 }}>
+      {/*<Grid container spacing={2} >*/}
+      <Grid container spacing={23} >
+        <Grid container direction="column" spacing={5}>
+          {/*<Grid size={{ xs: 12, xl: 5 }}>*/}
+          <Grid size={{ xs: 7, md: 12, xl:5, sm:15}} sx={{ marginBottom: '16px' }}>
             <LineChartWeather
               selectedVariable={selectedVariable}
               humidityData={humidityData}
@@ -299,33 +347,19 @@ function App() {
           </Grid>
 
           {/* Segundo gráfico */}
-          <Grid size={{ xs: 12 }}>
-          {/* Gráfico de velocidad del viento */}
+          {/*<Grid size={{ xs: 12 }} sx={{borderRadius: "16px", overflow: "hidden", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",}}>*/}
+          <Grid size={{xs:12, md:12, xl:5, sm:8}} sx={{ borderRadius: "16px", overflow: "hidden", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",  }}>
             <WindSpeedChart windSpeedData={windSpeedData} />
           </Grid>
-          
-          
         </Grid>
 
-        <Grid item xs={12} md={4} xl={3} container direction="column" spacing={5}>
-          {/* Columna para la tabla */}
-          <Grid item xs={12} md={8} xl={9} sx={{ width: "123%", height: "200%", marginLeft: "30px" }} spacing={5}>
+        <Grid  container direction="column" spacing={5}>
+          {/*<Grid sx={{ width: "123%", height: "200%", marginLeft: "30px" }} spacing={5}>*/}
+          <Grid size={{xs:12}} sx={{ marginTop: '16px' }}>
             <TableWeather itemsIn={items} />
           </Grid>
         </Grid>
       </Grid>
-
-      <Grid size={{ xs: 12, xl: 3 }}>
-        <ControlWeather
-          selectedVariable={selectedVariable}
-          onVariableChange={setSelectedVariable}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 10, xl: 3 }}>
-            <WindSpeedChart windSpeedData={windSpeedData} />
-      </Grid>
-
     </Grid>
   );
 }
