@@ -167,8 +167,6 @@ function App() {
         let precipitationValues: number[] = [];
         let cloudsValues: number[] = [];
         let labels: string[] = [];
-        let pressureValues: string[] = [];
-        let pressureUnits: string[] = [];
 
 
         const times = xml.getElementsByTagName("time");
@@ -192,7 +190,6 @@ function App() {
             time.getElementsByTagName("pressure")[0]?.getAttribute("unit") ||
             "";
 
-
           dataToItems.push({
             dateStart,
             dateEnd,
@@ -211,12 +208,6 @@ function App() {
           }
           if (clouds) {
             cloudsValues.push(parseFloat(clouds));
-          }
-          if (pressure) {
-            pressureValues.push(pressure);
-          }
-          if (pressureUnit) {
-            pressureUnits.push(pressureUnit);
           }
 
           labels.push(dateStart);
