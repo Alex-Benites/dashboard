@@ -19,9 +19,9 @@ import scaredCloud from './images/scaredCloud.png';
 import { useEffect, useState } from 'react';
 
 interface Indicator {
-  title?: String;
-  subtitle?: String;
-  value?: String;
+  title?: string;
+  subtitle?: string;
+  value?: string;
 }
 
 function App() {
