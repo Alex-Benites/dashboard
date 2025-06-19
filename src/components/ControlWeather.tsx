@@ -31,8 +31,8 @@ export default function ControlWeather({ selectedVariable, onVariableChange }: C
     ];
 
      {/* Arreglo de elementos JSX */}
-     const options = items.map((item, key) => (
-        <MenuItem key={key} value={item.value}>
+     const options = items.map((item) => (
+        <MenuItem key={item.value} value={item.value}>
           {item.name}
         </MenuItem>
      ));
@@ -40,7 +40,7 @@ export default function ControlWeather({ selectedVariable, onVariableChange }: C
      const handleChange = (event: SelectChangeEvent) => {
         const variable = event.target.value;
         onVariableChange(variable);
-			
+
         const idx = items.findIndex((item) => item.value === variable);
         if (descriptionRef.current !== null) {
             descriptionRef.current.innerHTML = idx >= 0 ? items[idx]['description'] : '';
@@ -53,7 +53,7 @@ export default function ControlWeather({ selectedVariable, onVariableChange }: C
     };
 
 
-        
+
      {/* JSX */}
      return (
        <Paper
@@ -61,8 +61,8 @@ export default function ControlWeather({ selectedVariable, onVariableChange }: C
         p: 2,
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: "16px", 
-        overflow: "hidden", 
+        borderRadius: "16px",
+        overflow: "hidden",
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
         background: '#f3f3f3'
       }}
