@@ -43,11 +43,9 @@
 
 
 body {
-  background-image: url('./images/Fondo.svg'); 
-  background-size: cover; 
+  background-image: url('./images/Fondo.svg');
+  background-size: cover;
   background-repeat: no-repeat;
-  background-position: center; 
-  /*background-attachment: fixed;*/ 
-  /*color: #333; */
+  background-position: center;
 }
 
